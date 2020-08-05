@@ -1,3 +1,4 @@
 network/config/*.*
 network/crypto-config/
-network/docker-compose-template.yml
+*node_modules/
+network/docker-compose.yml

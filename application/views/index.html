@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <!--jquery-->
+  <!-- slim/jquery, 3.1.0 윗 버전에서 ajax가 작동하지 않는 오류 확인 -->
+  <!-- Bootstrap의 CDN을 copy&paste 하되 Line 8의 버전만 3.1.0으로 수정하세요 -->
+  <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h2>Teamate Simple Page</h2>
+    <form action="#">
+      <div id="add-result">&nbsp;</div>
+      <label for="fname">Mate name:</label><br>
+      <input type="text" id="add-name" name="name" value="John"><br><br>
+      <input type="button" value="Add User" id="add-button" class="btn btn-primary">
+      <div id="addr-result">&nbsp;</div>
+      <label for="fname">Mate name:</label><br>
+      <input type="text" id="addr-name" name="name" value="John"><br><br>
+      <label for="fname">Project name:</label><br>
+      <input type="text" id="addr-project" name="project" value="project"><br><br>
+      <label for="fname">Project score:</label><br>
+      <input type="text" id="addr-score" name="score" value="5"><br><br>
+      <input type="button" value="Add Rating" id="addr-button" class="btn btn-primary">
+      <div id="read-result">&nbsp;</div>
+      <label for="fname">Mate name:</label><br>
+      <input type="text" id="read-name" name="name" value="John"><br><br>
+      <input type="button" value="Read User" id="read-button" class="btn btn-success"><br><br>
+      <table class="table">
+        <tbody id="table"></tbody>
+      </table>
+    </form>
+  </div>
+</body>
+<script>
+  $("#add-button").click(() => {
+    const name = $("#add-name").val();
+    const url = "/mate"
+    $.post(url, { name: name }, (data, status) => {
+      if (status == "success") {
+        //$('#add-result').append(data)
+        $('#add-result').append("<div id='success' class='alert alert-success'>메이트 추가를 성공했습니다!</div>");
+        $('#add-result').fadeOut(4000);
+      }
+    })
+  })
+  $("#addr-button").click(() => {
+    const n = $("#addr-name").val();
+    const p = $("#addr-project").val();
+    const s = $("#addr-score").val();
+    const url = "/score"
+    $.post(url, { name: n, project: p, score: s }, (data, status) => {
+      // http 상태 코드가 200 이라면
+      if (status == "success") {
+        //성공했다는 alert창을 띄움
+        $('#addr-result').append("<div id='success' class='alert alert-success'>점수추가를 성공했습니다!</div>");
+        $('#addr-result').fadeOut(4000);
+      }
+    })
+  })
+  $("#read-button").click(() => {
+    const value = $("#read-name").val();
+    const url = "/mate/" + value
+    $.post(url, { name: value }, (data) => {
+      //조회했을 때 값이 null이 아니면 (일치하는 값이 존재한다면)
+      if (status != null) {
+        $('#read-result').append("<div id='success' class='alert alert-success'>조회를 성공했습니다!</div>");
+        $('#read-result').fadeOut(2000);
+        //stringfy는 json 객체를 string으로, parse는 string을 json객체로 변환시켜줌
+        const test = JSON.stringify(data)
+        const parsedData = JSON.parse(test)
+        console.log(test)
+        $('#table').empty();
+        //평균 값 보여주기
+        $('#table').append("<tr><th scope='row'>average</th><td>" + parsedData.Average + "</td></tr>")
+        // Line 69~ 86 : rates라는 key의 value로 Json array가 있으므로 반복문을 통해 한 줄씩 테이블에 넣어줌
+        for (var i = 0; i < parsedData.Rates.length; i++) {
+          $('#table').append("<tr><th scope='row'>project title</th><td>" + parsedData.Rates[i].projecttilte + "</td></tr>")
+          $('#table').append("<tr><th scope='row'>score</th><td>" + parsedData.Rates[i].score + "</td></tr>")
+        }
+      }
+    })
+  })
+</script>
+
+</html>
